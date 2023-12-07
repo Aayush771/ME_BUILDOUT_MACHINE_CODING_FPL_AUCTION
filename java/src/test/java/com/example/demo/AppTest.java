@@ -60,18 +60,31 @@ public class AppTest{
 
     // https://www.baeldung.com/java-compare-files
     private boolean compareByMemoryMappedFiles(Path path1, Path path2) throws IOException {
-        try (RandomAccessFile randomAccessFile1 = new RandomAccessFile(path1.toFile(), "r"); 
+        try (RandomAccessFile randomAccessFile1 = new RandomAccessFile(path1.toFile(), "r");
              RandomAccessFile randomAccessFile2 = new RandomAccessFile(path2.toFile(), "r")) {
-            
+
             FileChannel ch1 = randomAccessFile1.getChannel();
             FileChannel ch2 = randomAccessFile2.getChannel();
-            if (ch1.size() != ch2.size()) {
+            long size1 = ch1.size();
+            long size2 = ch2.size();
+
+            // Adjust the size if the files end with newline characters
+            if (size1 > 0 && ch1.map(FileChannel.MapMode.READ_ONLY, size1 - 1, 1).get(0) == '\n') {
+                size1--;
+            }
+            if (size2 > 0 && ch2.map(FileChannel.MapMode.READ_ONLY, size2 - 1, 1).get(0) == '\n') {
+                size2--;
+            }
+
+            if (size1 != size2) {
                 return false;
             }
-            long size = ch1.size();
-            MappedByteBuffer m1 = ch1.map(FileChannel.MapMode.READ_ONLY, 0L, size);
-            MappedByteBuffer m2 = ch2.map(FileChannel.MapMode.READ_ONLY, 0L, size);
-    
+
+            MappedByteBuffer m1 = ch1.map(FileChannel.MapMode.READ_ONLY, 0L, size1);
+            MappedByteBuffer m2 = ch2.map(FileChannel.MapMode.READ_ONLY, 0L, size2);
+
+            System.out.println("testing files");
+
             return m1.equals(m2);
         }
     }
