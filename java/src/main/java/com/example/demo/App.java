@@ -7,43 +7,45 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import com.example.demo.Commands.ComandConfig;
 
-import com.example.demo.entities.Greeting;
-import com.example.demo.repositories.GreetingRepository;
-import com.example.demo.repositories.IGreetingRepository;
-import com.example.demo.services.GreetingService;
+import com.example.demo.Commands.ICommandConfig;
+
+
 
 public class App {
 
-     // Initialize repositories
-    private final IGreetingRepository greetingRepository = new GreetingRepository();
-     
-      // Initialize services
-    private final GreetingService greetingService = new GreetingService(greetingRepository);
+    // Initialize repositories
+
+
+    // Initialize services
+   // private final GreetingService greetingService = new GreetingService(greetingRepository);
 
     public static void main(String[] args) {
 
         // Test your code by ading commands in sample_input/sample_input_one.txt
         // Run run.sh script using "bash run.sh" in your terminal.
-        if (args.length == 1){
+        if (args.length == 1) {
             List<String> commandLineArgs = new LinkedList<>(Arrays.asList(args));
             String inputFile = commandLineArgs.get(0).split("=")[1];
             try {
                 List<String> file_commands = Files.readAllLines(Paths.get(inputFile));
                 // Execute the commands
                 new App().run(file_commands);
+                // deleteExtraSpace();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             return;
-        }        
+        }
 
         // OR
         // Test your code by ading commands in this list
-        List<String> inplace_commands = new LinkedList<>(){
+        List<String> inplace_commands = new LinkedList<>() {
             {
                 add("CREATE_GREETING,Hello World!");
                 add("CREATE_GREETING,Bye World!");
@@ -53,60 +55,58 @@ public class App {
         };
 
         new App().run(inplace_commands);
- 
+
     }
 
-    public void run(List<String> commands){
+
+    public void run(List<String> commands) {
+
+        // System.out.println(commands);
+
+        ICommandConfig commandConfig = new ComandConfig();
+
 
         Iterator<String> it = commands.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             String line = it.next();
-                if(line == null){
-                    break;
-                }
-                List<String> tokens = Arrays.asList(line.split(","));
+            if (line.equals("") || line == null) {
+                break;
+            }
+            List<String> tokens = Arrays.asList(line.split(","));
 
-                try {
-                    //Execute Services
-                    switch(tokens.get(0)){
-                        case "CREATE_GREETING":
-                            CREATE_GREETING(tokens);
-                            break;
-                        case "LIST_GREETING":
-                            LIST_GREETING(tokens);
-                            break;
-                        case "GET_GREETING":
-                            GET_GREETING(tokens);
-                            break;
-                        // Add More case statements below to support other commands
-                       
-                        default:
+            try {
+                switch (tokens.get(0)) {
+                    case "REGISTER_PLAYER":
+                        commandConfig.REGISTER_PLAYER(tokens);
+                        break;
+                    case "REGISTER_TEAM":
+                        commandConfig.REGISTER_TEAM(tokens);
+                        break;
+                    case "START_AUCTION":
+                         commandConfig.START_AUCTION(tokens);
+                        break;
+                    case "BID_PLAYER":
+                         commandConfig.BID_PLAYER(tokens);
+                        break;
+                    case "CLOSE_AUCTION":
+                        commandConfig.CLOSE_AUCTION(tokens);
+                        break;
+                    case "TEAM_OVERVIEW":
+                        commandConfig.TEAM_OVERVIEW(tokens);
+                        break;
+                    case "PLAYER_OVERVIEW":
+                        commandConfig.PLAYER_OVERVIEW(tokens);
+                        break;
+                    // Add More case statements below to support other commands
+
+                    default:
                         throw new RuntimeException("INVALID_COMMAND");
                 }
-                } catch (Exception e) {
-                    System.out.println("ERROR: " + e.getMessage());
-                }
-        }
-    }
-
-
-    // CREATE_GREETING
-    private void CREATE_GREETING(List<String> tokens){
-        String message = tokens.get(1);
-        Greeting createGreet = greetingService.create(message);
-        System.out.println(createGreet);
-    }
-
-    // LIST_GREETING
-    private void LIST_GREETING(List<String> tokens){
-        List<Greeting> glist = greetingService.getAllGreetings();
-        System.out.println(glist);
-    }
-
-    // GET_GREETING
-    private void GET_GREETING(List<String> tokens){
-        Long id = Long.parseLong(tokens.get(1));
-        Greeting getGreet = greetingService.getGreeting(id);
-        System.out.println(getGreet);
-    }
+                // deleteExtraSpace();
+            } catch (Exception e) {
+                System.out.println("ERROR: " + e.getMessage());
+            }
+        }  
+    } 
 }
+
