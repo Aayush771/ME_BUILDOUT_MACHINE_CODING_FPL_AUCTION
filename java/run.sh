@@ -4,4 +4,4 @@
 # java -jar build/libs/example.jar INPUT_FILE=sample_input/sample_input_one.txt
 
 # or
-./gradlew run -q --args="INPUT_FILE=sample_input/sample_input_one.txt"
+./gradlew run -q --args="INPUT_FILE=src/test/resources/test_input_one.txt"
